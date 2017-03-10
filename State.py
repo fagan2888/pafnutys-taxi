@@ -1,7 +1,5 @@
-number_of_states = 0
-
 class State:
-    def __init__(self, center):
+    def __init__(self, center, identifier):
         """
         `center` is a (lat, long) tuple
         `transition_counts` is the counts between this state and all other states. 
@@ -16,10 +14,8 @@ class State:
         >>> state1.count
         1
         """
-        global number_of_states
         self.center = center
-        self.identifier = number_of_states
-        number_of_states += 1
+        self.identifier = identifier
         self.transition_counts = dict()
 
         # for k-means
@@ -34,14 +30,15 @@ class State:
 
     def add_destination(self, destination):
         destination_identifier = destination.identifier
-        if destination_identifier not in transition_counts:
-            transition_counts[destination_identifier] = 0
-        transition_counts[destination_identifier] += 1
+        if destination_identifier not in self.transition_counts:
+            self.transition_counts[destination_identifier] = 0
+        self.transition_counts[destination_identifier] += 1
 
     def add_position(self, position):
         latitude, longitude = position
         self.total_latitude += latitude
         self.total_longitude += longitude
+        self.number_of_positions += 1
 
     def update_center(self):
         new_latitude = self.total_latitude / self.number_of_positions
