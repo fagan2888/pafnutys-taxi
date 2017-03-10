@@ -1,7 +1,5 @@
-number_of_states = 0
-
 class State:
-    def __init__(self, center):
+    def __init__(self, center, id):
         """
         `center` is a (lat, long) tuple
         `transition_counts` is the counts between this state and all other states. 
@@ -16,10 +14,8 @@ class State:
         >>> state1.count
         1
         """
-        global number_of_states
         self.center = center
-        self.identifier = number_of_states
-        number_of_states += 1
+        self.id = id
         self.transition_counts = dict()
 
         # for k-means
@@ -27,21 +23,21 @@ class State:
         self.total_longitude = 0
         self.number_of_positions = 0
 
-    def probability_to(self, state):
+    def probability_to(self, destination_id):
         total = sum(self.transition_counts.values())
-        destination_count = self.transition_counts[state]
+        destination_count = self.transition_counts[destination_id]
         return destination_count / total
 
-    def add_destination(self, destination):
-        destination_identifier = destination.identifier
-        if destination_identifier not in transition_counts:
-            transition_counts[destination_identifier] = 0
-        transition_counts[destination_identifier] += 1
+    def add_destination(self, destination_id):
+        if destination_id not in self.transition_counts:
+            self.transition_counts[destination_id] = 0
+        self.transition_counts[destination_id] += 1
 
     def add_position(self, position):
         latitude, longitude = position
         self.total_latitude += latitude
         self.total_longitude += longitude
+        self.number_of_positions += 1
 
     def update_center(self):
         new_latitude = self.total_latitude / self.number_of_positions
