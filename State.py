@@ -25,6 +25,8 @@ class State:
 
     def probability_to(self, destination_id):
         total = sum(self.transition_counts.values())
+        if destination_id not in self.transition_counts:
+            return 0
         destination_count = self.transition_counts[destination_id]
         return destination_count / total
 
