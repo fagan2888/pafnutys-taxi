@@ -42,19 +42,19 @@ class State:
         self.total_longitude += longitude
         self.number_of_positions += 1
 
-    def store_data(data_point):
+    def store_data(self, data_point):
         """if data_point is a start point then it will contain fare and 
         duration of the ride also passed in inside the tuple"""
         self.stored_points.add(data_point)
 
-    def clear_stored_data():
+    def clear_stored_data(self):
         self.stored_data = set()
 
-    def is_start(data_point):
+    def is_start(self, data_point):
         return len(data_point) == 3
 
     @property
-    def average_cost():
+    def average_cost(self):
         total_fare = 0
         total_number_of_start_points = 0
         for data_point in self.stored_data:
