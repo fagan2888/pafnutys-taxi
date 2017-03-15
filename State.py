@@ -42,9 +42,9 @@ class State:
         self.total_longitude += longitude
         self.number_of_positions += 1
 
-    def store_data(data_point, contains_extra_info):
-        """`contains_extra_info` will indicate whether the fare and 
-        duration of the ride are also passed in inside the tuple"""
+    def store_data(data_point):
+        """if data_point is a start point then it will contain fare and 
+        duration of the ride also passed in inside the tuple"""
         self.stored_points.add(data_point)
 
     def clear_stored_data():
@@ -52,6 +52,17 @@ class State:
 
     def is_start(data_point):
         return len(data_point) == 3
+
+    @property
+    def average_cost():
+        total_fare = 0
+        total_number_of_start_points = 0
+        for data_point in self.stored_data:
+            if is_start(data_point):
+                total_number_of_start_points += 1
+                position, fare, time = data_point
+                total_fare += fare
+        return total_fare_so_far / total_number_of_start_points
 
     def update_center(self):
         """Returns difference between new center and old center as tuple."""
