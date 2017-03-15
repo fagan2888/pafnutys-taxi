@@ -1,5 +1,5 @@
 class State:
-    def __init__(self, center, id):
+    def __init__(self, center, identifier):
         """
         `center` is a (lat, long) tuple
         `transition_counts` is the counts between this state and all other states. 
@@ -15,7 +15,7 @@ class State:
         1
         """
         self.center = center
-        self.id = id
+        self.id = identifier
         self.transition_counts = dict()
 
         # for k-means
@@ -42,11 +42,15 @@ class State:
         self.number_of_positions += 1
 
     def update_center(self):
+        """Returns difference between new center and old center as tuple."""
         new_latitude = self.total_latitude / self.number_of_positions
         new_longitude = self.total_longitude / self.number_of_positions
+        latitude, longitude = self.center
+        difference = (abs(new_latitude - latitude), abs(new_longitude - longitude))
         self.center = (new_latitude, new_longitude)
 
         self.total_latitude = 0
         self.total_longitude = 0
         self.number_of_positions = 0
+        return difference
 
