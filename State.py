@@ -17,6 +17,7 @@ class State:
         self.center = center
         self.id = identifier
         self.transition_counts = dict()
+        self.stored_data = set()
 
         # for k-means
         self.total_latitude = 0
@@ -40,6 +41,17 @@ class State:
         self.total_latitude += latitude
         self.total_longitude += longitude
         self.number_of_positions += 1
+
+    def store_data(data_point, contains_extra_info):
+        """`contains_extra_info` will indicate whether the fare and 
+        duration of the ride are also passed in inside the tuple"""
+        self.stored_points.add(data_point)
+
+    def clear_stored_data():
+        self.stored_data = set()
+
+    def is_start(data_point):
+        return len(data_point) == 3
 
     def update_center(self):
         """Returns difference between new center and old center as tuple."""
