@@ -69,13 +69,14 @@ class State:
         new_latitude = self.total_latitude / self.number_of_positions
         new_longitude = self.total_longitude / self.number_of_positions
         latitude, longitude = self.center
-        difference = (abs(new_latitude - latitude), abs(new_longitude - longitude))
+        distance_difference = ((new_latitude - latitude) ** 2 + \
+                               (new_longitude - longitude) ** 2) ** 1 / 2
         self.center = (new_latitude, new_longitude)
 
         self.total_latitude = 0
         self.total_longitude = 0
         self.number_of_positions = 0
-        return difference
+        return distance_difference
 
     def distance_from_center(self, location):
         latitude, longitude = location
