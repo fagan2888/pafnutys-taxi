@@ -89,6 +89,6 @@ class State:
         total_distance = 0
         for data_point in self.stored_data:
             location = data_point[0]
-            total_distance += distance_from_center(location)
+            total_distance += self.distance_from_center(location)
         return total_distance
 
