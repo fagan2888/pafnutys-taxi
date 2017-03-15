@@ -43,8 +43,8 @@ class State:
         self.number_of_positions += 1
 
     def store_data(self, data_point):
-        """if data_point is a start point then it will contain fare and 
-        duration of the ride also passed in inside the tuple"""
+        """if `data_point` is a start point then it will contain fare 
+        and duration of the ride also passed in inside the tuple"""
         self.stored_data.add(data_point)
 
     def clear_stored_data(self):
@@ -76,4 +76,18 @@ class State:
         self.total_longitude = 0
         self.number_of_positions = 0
         return difference
+
+    def distance_from_center(self, location):
+        latitude, longitude = location
+        center_latitude, center_longitude = self.center
+        return ((center_latitude - latitude) ** 2 + \
+               (center_longitude - longitude) ** 2) # ** (1 / 2)
+
+    @property
+    def sum_of_squared_errors(self):
+        total_distance = 0
+        for data_point in self.stored_data:
+            location = data_point[0]
+            total_distance += distance_from_center(location)
+        return total_distance
 
