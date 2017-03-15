@@ -45,7 +45,7 @@ class State:
     def store_data(self, data_point):
         """if data_point is a start point then it will contain fare and 
         duration of the ride also passed in inside the tuple"""
-        self.stored_points.add(data_point)
+        self.stored_data.add(data_point)
 
     def clear_stored_data(self):
         self.stored_data = set()
