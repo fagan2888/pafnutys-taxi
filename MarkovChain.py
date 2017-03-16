@@ -129,7 +129,7 @@ class MarkovChain:
             total_duration += duration
             need_to_visit.remove(next_id)
         return states_visited, len(states_visited), total_fare, total_duration
-    
+
     def traveling_salesman_simulator(self, num_of_simulations=100):
         average_number_of_states_by_state = []
         average_duration_by_state = []
