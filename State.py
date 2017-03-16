@@ -112,7 +112,7 @@ class State:
         for destination_id in range(self.total_number_of_transition_states):
             cumulative_probability += self.probability_to(destination_id)
             cumulative_probability_list.append(cumulative_probability)
-        assert abs(cumulative_probability - 1) <= 1e-3, cumulative_probability
+        assert abs(cumulative_probability - 1) <= 1e-3, "{}".format(cumulative_probability)
 
         random_number = random.random()
         destination_id = 0
