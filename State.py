@@ -30,9 +30,9 @@ class State:
         self.number_of_positions = 0
 
     def probability_to(self, destination_id):
-        total = sum(self.transition_counts.values())
         if destination_id not in self.transition_counts:
             return 0
+        total = sum(self.transition_counts.values())
         destination_count = self.transition_counts[destination_id]
         return destination_count / total
 
@@ -109,11 +109,10 @@ class State:
         of the ride there."""
         cumulative_probability = 0
         cumulative_probability_list = []
-        for destination_id in range(self.total_number_of_transition_states):
+        for destination_id in range(self.total_number_of_transition_states + 1):
             cumulative_probability += self.probability_to(destination_id)
             cumulative_probability_list.append(cumulative_probability)
-        print(cumulative_probability)
-        assert abs(cumulative_probability - 1) <= 1e-3
+        assert abs(cumulative_probability - 1) <= 1e-3, "{}".format(cumulative_probability)
 
         random_number = random.random()
         destination_id = 0
