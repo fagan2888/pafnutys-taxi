@@ -25,8 +25,8 @@ class MarkovChain:
         ident = 0
         for c_ind in centers:
             # out of convenience, we aren't messing with pickup lat lon
-            lat = self.raw.ix[c_ind]["dropoff_latitude"]
-            lon = self.raw.ix[c_ind]["dropoff_longitude"]
+            lat = self.raw.ix[c_ind]["pickup_latitude"]
+            lon = self.raw.ix[c_ind]["pickup_longitude"]
             s = State.State((lat, lon), ident)
             self.state_set.add(s)
             self.id_to_state[ident] = s
@@ -85,7 +85,7 @@ class MarkovChain:
 #     def random_walk_given_time_cap(self, start_id, duration_cap):
 #         while
 
-    def random_walk(self, start_id, walk_length=10):
+    def random_walk(self, start_id, walk_length):
         total_duration = 0
         total_fare = 0
         states_visited = []
@@ -98,14 +98,13 @@ class MarkovChain:
             total_duration += duration
         return states_visited, total_fare, total_duration
 
-    def random_walk_simulator(self):
-        num_of_simulations = 100
+    def random_walk_simulator(self, num_of_simulations=100, walk_length=10):
         average_fare_by_state = []
         average_duration_by_state = []
-        for _ in range(num_of_simulations):
+        for state_id in range(self.k):
             list_of_random_walks = []
-            for state_id in range(k):
-                random_walk_simulation = self.random_walk(state_id)
+            for _ in range(num_of_simulations):
+                random_walk_simulation = self.random_walk(state_id, walk_length)
                 list_of_random_walks.append(random_walk_simulation)
             total_fare = sum([walk[1] for walk in list_of_random_walks])
             average_fare = total_fare / num_of_simulations
@@ -129,14 +128,35 @@ class MarkovChain:
             total_fare += fare
             total_duration += duration
             need_to_visit.remove(next_id)
-        return states_visited, total_fare, total_duration
+        return states_visited, len(states_visited), total_fare, total_duration
+    
+    def traveling_salesman_simulator(self, num_of_simulations=100):
+        average_number_of_states_by_state = []
+        average_duration_by_state = []
+        for state_id in range(self.k):
+            for _ in range(num_of_simulations):
+                states_visited, number_of_states_visited, fare, duration = self.traveling_salesman(state_id)
+                total_number_of_states += number_of_states_visited
+#                 total_fare += fare
+                total_duration += duration
+            average_number_of_states = total_number_of_states / num_of_simulations
+            average_number_of_states_by_state.append(average_number_of_states)
+            average_duration = total_duration / num_of_simulations
+            average_duration_by_state.append(average_duration)
+        return average_number_of_states_by_state, average_duration_by_state
 
     ##
     # GETTERS
     ##
+    def get_invariant(self):
+        adjm = self.get_adjacency_matrix()
+        S, U = np.linalg.eig(adjm.T)
+        inv_dist = U.T[0]
+        norm_inv_dist = inv_dist / float(sum(inv_dist))
+        return norm_inv_dist
 
     def get_state(self, iden):
-        return self.id_to_state(iden)
+        return self.id_to_state[iden]
 
     def get_state_set(self):
         return self.state_set
@@ -150,7 +170,7 @@ class MarkovChain:
     def find_closest_state(self, pos):
         def distance(state, pos):
             clat, clon = state.center
-            return ((clat - pos[0])**2 + (clon - pos[1])**2)**0.5
+            return float(((clat - pos[0])**2 + (clon - pos[1])**2))**0.5
         closest = None
         min_dist = None
         for state in self.state_set:
@@ -158,6 +178,7 @@ class MarkovChain:
             if closest == None or d < min_dist:
                 closest = state
                 min_dist = d
+        assert(closest != None)
         return closest
 
     def row_to_positions(self, row):
