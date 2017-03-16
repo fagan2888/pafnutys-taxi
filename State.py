@@ -109,7 +109,8 @@ class State:
         of the ride there."""
         cumulative_probability = 0
         cumulative_probability_list = []
-        for destination_id in range(self.total_number_of_transition_states + 1):
+        print(self.total_number_of_transition_states)
+        for destination_id in range(self.total_number_of_transition_states):
             cumulative_probability += self.probability_to(destination_id)
             cumulative_probability_list.append(cumulative_probability)
         assert abs(cumulative_probability - 1) <= 1e-3, "{}".format(cumulative_probability)
