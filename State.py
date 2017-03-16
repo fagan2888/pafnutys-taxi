@@ -115,7 +115,7 @@ class State:
 
         random_number = random.random()
         counter = 0
-        while counter <= len(transition_counts):
+        while counter <= len(transition_states):
             if random_number <= cumulative_probability_list[counter]:
                 destination_id = transition_states[counter]
                 expected_fare = expected_fare_to(destination_id)
