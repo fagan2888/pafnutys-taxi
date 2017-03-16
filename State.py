@@ -1,3 +1,5 @@
+import random
+
 class State:
     def __init__(self, center, identifier):
         """
@@ -16,8 +18,11 @@ class State:
         """
         self.center = center
         self.id = identifier
-        self.transition_counts = dict()
+        self.transition_counts = dict() # key: destination id, value: total number of rides there
+        self.total_fare = dict() # key: destination id, value: total fare for all rides there
+        self.total_duration = dict() # key: destination id, value: total duration for all rides there
         self.stored_data = set()
+        self.total_number_of_transition_states = 0
 
         # for k-means
         self.total_latitude = 0
@@ -31,10 +36,29 @@ class State:
         destination_count = self.transition_counts[destination_id]
         return destination_count / total
 
-    def add_destination(self, destination_id):
+    def expected_fare_to(self, destination_id):
+        if destination_id not in self.total_fare:
+            return 0
+        total_fare_to_destination = self.total_fare[destination_id]
+        destination_count = self.transition_counts[destination_id]
+        return total_fare_to_destination / destination_count
+
+    def expected_duration_to(self, destination_id):
+        if destination_id not in self.total_duration:
+            return 0
+        total_duration_to_destination = self.total_duration[destination_id]
+        destination_count = self.transition_counts[destination_id]
+        return total_duration_to_destination / destination_count
+
+    def add_destination(self, destination_id, fare, duration):
         if destination_id not in self.transition_counts:
             self.transition_counts[destination_id] = 0
+            self.total_fare[destination_id] = 0
+            self.total_duration[destination_id] = 0
+            self.total_number_of_transition_states += 1
         self.transition_counts[destination_id] += 1
+        self.total_fare[destination_id] += fare
+        self.total_duration[destination_id] += duration
 
     def add_position(self, position):
         latitude, longitude = position
@@ -43,26 +67,24 @@ class State:
         self.number_of_positions += 1
 
     def store_data(self, data_point):
-        """if `data_point` is a start point then it will contain fare
-        and duration of the ride also passed in inside the tuple"""
         self.stored_data.add(data_point)
 
     def clear_stored_data(self):
         self.stored_data = set()
 
-    def is_start(self, data_point):
-        return len(data_point) == 3
+    # def is_start(self, data_point):
+    #     return len(data_point) == 3
 
-    @property
-    def average_cost(self):
-        total_fare = 0
-        total_number_of_start_points = 0
-        for data_point in self.stored_data:
-            if is_start(data_point):
-                total_number_of_start_points += 1
-                position, fare, time = data_point
-                total_fare += fare
-        return total_fare_so_far / total_number_of_start_points
+    # @property
+    # def average_cost(self):
+    #     total_fare = 0
+    #     total_number_of_start_points = 0
+    #     for data_point in self.stored_data:
+    #         if is_start(data_point):
+    #             total_number_of_start_points += 1
+    #             position, fare, time = data_point
+    #             total_fare += fare
+    #     return total_fare_so_far / total_number_of_start_points
 
     def update_center(self):
         """Returns difference between new center and old center as tuple."""
@@ -88,6 +110,13 @@ class State:
     def sum_of_squared_errors(self):
         total_distance = 0
         for data_point in self.stored_data:
-            location = data_point[0]
+            location = data_point
             total_distance += self.distance_from_center(location)
         return total_distance
+
+    def next_state(self):
+        """Returns a random destination state based on the Markov probabilities
+        along with the expected cost of a ride there and the expected duration
+        of the ride there."""
+
+
