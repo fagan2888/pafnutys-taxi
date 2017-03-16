@@ -107,7 +107,7 @@ class State:
         of the ride there."""
         cumulative_probability = 0
         cumulative_probability_list = []
-        transition_states = self.transition_counts.keys()
+        transition_states = list(self.transition_counts.keys())
         for destination_id in transition_states:
             cumulative_probability += self.probability_to(destination_id)
             cumulative_probability_list.append(cumulative_probability)
