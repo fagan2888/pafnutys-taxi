@@ -72,20 +72,9 @@ class State:
     def clear_stored_data(self):
         self.stored_data = set()
 
-    # def is_start(self, data_point):
-    #     return len(data_point) == 3
-
-    # @property
-    # def average_cost(self):
-    #     total_fare = 0
-    #     total_number_of_start_points = 0
-    #     for data_point in self.stored_data:
-    #         if is_start(data_point):
-    #             total_number_of_start_points += 1
-    #             position, fare, time = data_point
-    #             total_fare += fare
-    #     return total_fare_so_far / total_number_of_start_points
-
+    def get_all_points(self):
+        return self.stored_data
+    
     def update_center(self):
         """Returns difference between new center and old center as tuple."""
         new_latitude = self.total_latitude / self.number_of_positions
