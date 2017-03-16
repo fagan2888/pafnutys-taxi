@@ -74,7 +74,7 @@ class State:
 
     def get_all_points(self):
         return self.stored_data
-    
+
     def update_center(self):
         """Returns difference between new center and old center as tuple."""
         new_latitude = self.total_latitude / self.number_of_positions
@@ -112,7 +112,7 @@ class State:
         for destination_id in range(self.total_number_of_transition_states):
             cumulative_probability += self.probability_to(destination_id)
             cumulative_probability_list.append(cumulative_probability)
-        assert abs(cumulative_probability - 1) <= 1e-3
+        assert abs(cumulative_probability - 1) <= 1e-3, cumulative_probability
 
         random_number = random.random()
         destination_id = 0
