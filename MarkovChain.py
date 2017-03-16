@@ -1,21 +1,24 @@
+import State as State
+importlib.reload(State)
+
 class MarkovChain:
     # num centers are we picking for k-means
-    def __init__(self, raw, k):
+    def __init__(self, raw, k, epsilon = 1e-12):
         self.state_set = set()
         self.id_to_state = {}
         self.adj_matrix = None
         self.raw = raw
 
         self.initialize_centers(k)
-        epsilon = 1e-3
-        self.build_states_kmeans(1001, epsilon)
+
+        self.build_states_kmeans(1000, epsilon)
 
         self.add_points_edges()
         self.make_adjacency_matrix()
 
     def initialize_centers(self, k):
         ind = [i for i in range(len(self.raw))]
-        rand.shuffle(ind)
+#         rand.shuffle(ind)
         centers = ind[:k]
         # initialize centers
         ident = 0
@@ -54,14 +57,15 @@ class MarkovChain:
             closest_to_end = self.find_closest_state(pos_end)
 
             fare = self.row_to_fare(row)
+            duration = self.row_to_trip_duration_seconds(row)
             tdistance = self.row_to_distance(row)
 
             #Add points to respective states
-            closest_to_start.store_data((pos_start, fare, tdistance))
-            closest_to_end.store_data(((pos_end),))
+            closest_to_start.store_data(pos_start)
+            closest_to_end.store_data(pos_end)
 
             ##Add this edge to markov state
-            closest_to_start.add_destination(closest_to_end.id)
+            closest_to_start.add_destination(closest_to_end.id, fare, duration)
 
 
     def make_adjacency_matrix(self):
@@ -76,9 +80,49 @@ class MarkovChain:
             total += s.sum_of_squared_errors
         return total
 
+
+#     def random_walk_given_time_cap(self, start_id, duration_cap):
+#         while
+
+    def random_walk(self, start_id, walk_length):
+        total_duration = 0
+        total_fare = 0
+        states_visited = []
+        next_id = start_id
+        for i in range(walk_length):
+            states_visited.append(next_id)
+            s = self.get_state(next_id)
+            next_id, fare, duration = s.next_state()
+            total_fare += fare
+            total_duration += duration
+        return states_visited, total_fare, total_duration
+
+    def traveling_salesman(self, start_id):
+        total_duration = 0
+        total_fare = 0
+        states_visited = []
+        next_id = start_id
+        need_to_visit = set(self.id_to_state.keys()[:])
+        need_to_visit.remove(start_id)
+        while(len(need_to_visit)):
+            states_visited.append(next_id)
+            s = self.get_state(next_id)
+            next_id, fare, duration = s.next_state()
+            total_fare += fare
+            total_duration += duration
+            need_to_visit.remove(next_id)
+        return states_visited, total_fare, total_duration
+
     ##
     # GETTERS
     ##
+
+    def get_state(self, iden):
+        return self.id_to_state(iden)
+
+    def get_state_set(self):
+        return self.state_set
+
     def get_adjacency_matrix(self):
         return self.adj_matrix
 
@@ -113,6 +157,10 @@ class MarkovChain:
         return row["payment_amount"]
     def row_to_distance(self, row):
         return row["trip_distance"]
+    def row_to_trip_duration_seconds(self, row):
+        diff = row["pickup_datetime"] - row["dropoff_datetime"]
+        return diff.total_seconds()
+
 
     def transition_probability(self, i, j):
         return self.id_to_state[i].probability_to(j)
