@@ -108,6 +108,7 @@ class State:
         cumulative_probability = 0
         cumulative_probability_list = []
         transition_states = list(self.transition_counts.keys())
+        print(transition_states)
         for destination_id in transition_states:
             cumulative_probability += self.probability_to(destination_id)
             cumulative_probability_list.append(cumulative_probability)
