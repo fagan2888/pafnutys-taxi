@@ -2,7 +2,7 @@ class State:
     def __init__(self, center, identifier):
         """
         `center` is a (lat, long) tuple
-        `transition_counts` is the counts between this state and all other states. 
+        `transition_counts` is the counts between this state and all other states.
         The transition probabilities can be calcluated on demand
 
         >>> state0 = State((10, 15))
@@ -43,7 +43,7 @@ class State:
         self.number_of_positions += 1
 
     def store_data(self, data_point):
-        """if `data_point` is a start point then it will contain fare 
+        """if `data_point` is a start point then it will contain fare
         and duration of the ride also passed in inside the tuple"""
         self.stored_data.add(data_point)
 
@@ -91,4 +91,3 @@ class State:
             location = data_point[0]
             total_distance += self.distance_from_center(location)
         return total_distance
-
