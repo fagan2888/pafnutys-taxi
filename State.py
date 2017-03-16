@@ -22,7 +22,6 @@ class State:
         self.total_fare = dict() # key: destination id, value: total fare for all rides there
         self.total_duration = dict() # key: destination id, value: total duration for all rides there
         self.stored_data = set()
-        self.total_number_of_transition_states = 0
 
         # for k-means
         self.total_latitude = 0
@@ -30,9 +29,9 @@ class State:
         self.number_of_positions = 0
 
     def probability_to(self, destination_id):
-        total = sum(self.transition_counts.values())
         if destination_id not in self.transition_counts:
             return 0
+        total = sum(self.transition_counts.values())
         destination_count = self.transition_counts[destination_id]
         return destination_count / total
 
@@ -55,7 +54,6 @@ class State:
             self.transition_counts[destination_id] = 0
             self.total_fare[destination_id] = 0
             self.total_duration[destination_id] = 0
-            self.total_number_of_transition_states += 1
         self.transition_counts[destination_id] += 1
         self.total_fare[destination_id] += fare
         self.total_duration[destination_id] += duration
@@ -74,7 +72,7 @@ class State:
 
     def get_all_points(self):
         return self.stored_data
-    
+
     def update_center(self):
         """Returns difference between new center and old center as tuple."""
         new_latitude = self.total_latitude / self.number_of_positions
@@ -109,19 +107,21 @@ class State:
         of the ride there."""
         cumulative_probability = 0
         cumulative_probability_list = []
-        for destination_id in range(self.total_number_of_transition_states):
+        transition_states = list(self.transition_counts.keys())
+        for destination_id in transition_states:
             cumulative_probability += self.probability_to(destination_id)
             cumulative_probability_list.append(cumulative_probability)
-        assert abs(cumulative_probability - 1) <= 1e-3
+        assert abs(cumulative_probability - 1) <= 1e-3, "{}".format(cumulative_probability)
 
         random_number = random.random()
-        destination_id = 0
-        while destination_id <= self.total_number_of_transition_states:
-            if random_number <= cumulative_probability_list[destination_id]:
-                expected_fare = expected_fare_to(destination_id)
-                expected_duration = expected_duration_to(destination_id)
+        counter = 0
+        while counter <= len(transition_states):
+            if random_number <= cumulative_probability_list[counter]:
+                destination_id = transition_states[counter]
+                expected_fare = self.expected_fare_to(destination_id)
+                expected_duration = self.expected_duration_to(destination_id)
                 return destination_id, expected_fare, expected_duration
-            destination_id += 1
+            counter += 1
 
         raise ValueError("Could not find a valid next_state")
 

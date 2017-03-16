@@ -8,6 +8,7 @@ class MarkovChain:
         self.id_to_state = {}
         self.adj_matrix = None
         self.raw = raw
+        self.k = k
 
         self.initialize_centers(k)
 
@@ -84,7 +85,7 @@ class MarkovChain:
 #     def random_walk_given_time_cap(self, start_id, duration_cap):
 #         while
 
-    def random_walk(self, start_id, walk_length):
+    def random_walk(self, start_id, walk_length=10):
         total_duration = 0
         total_fare = 0
         states_visited = []
@@ -96,6 +97,23 @@ class MarkovChain:
             total_fare += fare
             total_duration += duration
         return states_visited, total_fare, total_duration
+
+    def random_walk_simulator(self):
+        num_of_simulations = 100
+        average_fare_by_state = []
+        average_duration_by_state = []
+        for _ in range(num_of_simulations):
+            list_of_random_walks = []
+            for state_id in range(k):
+                random_walk_simulation = self.random_walk(state_id)
+                list_of_random_walks.append(random_walk_simulation)
+            total_fare = sum([walk[1] for walk in list_of_random_walks])
+            average_fare = total_fare / num_of_simulations
+            average_fare_by_state.append(average_fare)
+            total_duration = sum([walk[2] for walk in list_of_random_walks])
+            average_duration = total_duration / num_of_simulations
+            average_duration_by_state.append(average_fare)
+        return average_fare_by_state, average_duration_by_state
 
     def traveling_salesman(self, start_id):
         total_duration = 0
