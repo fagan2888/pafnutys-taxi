@@ -118,5 +118,21 @@ class State:
         """Returns a random destination state based on the Markov probabilities
         along with the expected cost of a ride there and the expected duration
         of the ride there."""
+        cumulative_probability = 0
+        cumulative_probability_list = []
+        for destination_id in range(self.total_number_of_transition_states):
+            cumulative_probability += self.probability_to(destination_id)
+            cumulative_probability_list.append(cumulative_probability)
+        assert abs(cumulative_probability - 1) <= 1e-3
 
+        random_number = random.random()
+        destination_id = 0
+        while destination_id <= self.total_number_of_transition_states:
+            if random_number <= cumulative_probability_list[destination_id]:
+                expected_fare = expected_fare_to(destination_id)
+                expected_duration = expected_duration_to(destination_id)
+                return destination_id, expected_fare, expected_duration
+            destination_id += 1
+
+        raise ValueError("Could not find a valid next_state")
 
