@@ -118,8 +118,8 @@ class State:
         while counter <= len(transition_states):
             if random_number <= cumulative_probability_list[counter]:
                 destination_id = transition_states[counter]
-                expected_fare = expected_fare_to(destination_id)
-                expected_duration = expected_duration_to(destination_id)
+                expected_fare = self.expected_fare_to(destination_id)
+                expected_duration = self.expected_duration_to(destination_id)
                 return destination_id, expected_fare, expected_duration
             counter += 1
 
